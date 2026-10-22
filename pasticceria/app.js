@@ -5,7 +5,7 @@
   const STORE_KEY = "aurora_orders";
   // URL della Web App di Google Apps Script (vedi google-calendar/LEGGIMI.md).
   // Vuoto = modalità demo: disponibilità simulata e ordini solo nel browser.
-  const CALENDAR_ENDPOINT = "";
+  const CALENDAR_ENDPOINT = "https://script.google.com/macros/s/AKfycbylnBlk2JUccjrcTHzExS9S092SPkR17HAYxYEBg8_Bn8MHaxbwq1COPb96SAXYKRM-cg/exec";
 
   /* ---------- Data ---------- */
   const products = [
