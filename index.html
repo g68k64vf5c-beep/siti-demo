@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f4f0">
+  <title>Siti demo · Prenotazioni online</title>
+  <meta name="description" content="Tre siti dimostrativi con prenotazione integrata: pasticceria, ristorante e barberia. Ottimizzati per smartphone.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg: #f6f4f0; --ink: #191714; --soft: #6e685f; --line: #e4dfd6; --card: #fff; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Inter", system-ui, sans-serif; background: var(--bg); color: var(--ink); line-height: 1.55; -webkit-tap-highlight-color: transparent; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 48px 16px 40px; }
+    .eyebrow { font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; color: var(--soft); font-weight: 600; }
+    h1 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; font-size: clamp(2.6rem, 11vw, 4.6rem); line-height: 1; margin: 12px 0 14px; letter-spacing: -.01em; }
+    h1 em { color: #a5674b; }
+    .intro { color: var(--soft); max-width: 52ch; font-size: 1.05rem; }
+    .features { display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 36px; }
+    .features span { font-size: .82rem; font-weight: 500; padding: 7px 12px; border-radius: 999px; background: var(--card); border: 1px solid var(--line); }
+    .grid { display: grid; gap: 16px; }
+    .demo { display: block; text-decoration: none; color: inherit; background: var(--card); border-radius: 22px; overflow: hidden; border: 1px solid var(--line); transition: transform .25s ease, box-shadow .25s ease; }
+    .demo:active { transform: scale(.985); }
+    .demo-img { position: relative; aspect-ratio: 16/10; overflow: hidden; }
+    .demo-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s ease; }
+    .demo-img .pill { position: absolute; left: 14px; top: 14px; font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; padding: 6px 10px; border-radius: 999px; background: rgba(255,255,255,.92); }
+    .demo-body { padding: 18px 18px 20px; display: flex; flex-direction: column; gap: 6px; }
+    .demo-body h2 { font-family: "Instrument Serif", Georgia, serif; font-weight: 400; font-size: 2rem; line-height: 1.05; }
+    .demo-body p { color: var(--soft); font-size: .92rem; }
+    .demo-body ul { list-style: none; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+    .demo-body li { font-size: .75rem; padding: 4px 9px; border-radius: 6px; background: var(--bg); font-weight: 500; }
+    .open { margin-top: 12px; display: inline-flex; align-items: center; justify-content: space-between; min-height: 48px; padding: 0 18px; border-radius: 12px; font-weight: 600; color: #fff; }
+    .open::after { content: "→"; font-size: 1.2rem; }
+    .p .open { background: #b4505a; }
+    .r .open { background: #1b1815; color: #d4a259; }
+    .b .open { background: #c9973f; color: #121212; }
+    .tip { margin-top: 36px; padding: 18px; border-radius: 16px; border: 1px dashed var(--line); background: var(--card); font-size: .9rem; color: var(--soft); display: flex; gap: 12px; align-items: flex-start; }
+    .tip b { color: var(--ink); }
+    footer { text-align: center; color: var(--soft); font-size: .8rem; padding: 10px 16px 36px; }
+    @media (min-width: 760px) {
+      .wrap { padding: 80px 32px 56px; }
+      .grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    }
+    @media (hover: hover) {
+      .demo:hover { transform: translateY(-6px); box-shadow: 0 24px 40px -24px rgba(25,23,20,.35); }
+      .demo:hover .demo-img img { transform: scale(1.05); }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <p class="eyebrow">Portfolio · Siti demo</p>
+    <h1>Il tuo locale, <em>prenotabile</em><br>dallo smartphone.</h1>
+    <p class="intro">Tre esempi di sito con prenotazione integrata, pensati per essere usati dal telefono. Aprili, prova a prenotare: funziona tutto, dall'orario libero alla conferma.</p>
+    <div class="features">
+      <span>📱 Ottimizzati per mobile</span>
+      <span>🗓️ Prenotazione in app</span>
+      <span>⚡ Veloci, senza installare nulla</span>
+      <span>📅 Aggiungi al calendario</span>
+    </div>
+
+    <div class="grid">
+      <a class="demo p" href="pasticceria/">
+        <div class="demo-img"><img src="https://images.unsplash.com/photo-1559620192-032c4bc4674e?auto=format&fit=crop&w=800&q=70" alt="Torta decorata con more e fiori"><span class="pill">Pasticceria</span></div>
+        <div class="demo-body">
+          <h2>Pasticceria Aurora</h2>
+          <p>Vetrina prodotti e ordine di torte su misura con prezzo calcolato in tempo reale.</p>
+          <ul><li>Configuratore torta</li><li>Ritiro o consegna</li><li>Fasce orarie</li></ul>
+          <span class="open">Apri il demo</span>
+        </div>
+      </a>
+      <a class="demo r" href="ristorante/">
+        <div class="demo-img"><img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=800&q=70" alt="Piatto gourmet al ristorante"><span class="pill">Ristorante</span></div>
+        <div class="demo-body">
+          <h2>Osteria del Borgo</h2>
+          <p>Menu digitale e prenotazione del tavolo con disponibilità per pranzo e cena.</p>
+          <ul><li>Menu a schede</li><li>Scelta della sala</li><li>Occasioni speciali</li></ul>
+          <span class="open">Apri il demo</span>
+        </div>
+      </a>
+      <a class="demo b" href="barberia/">
+        <div class="demo-img"><img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=800&q=70" alt="Interno di una barberia"><span class="pill">Barberia</span></div>
+        <div class="demo-body">
+          <h2>Ferro &amp; Lama</h2>
+          <p>Esperienza da app: scegli servizi, barbiere e orario libero in quattro tocchi.</p>
+          <ul><li>Agenda per barbiere</li><li>Più servizi insieme</li><li>I miei appuntamenti</li></ul>
+          <span class="open">Apri il demo</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="tip">
+      <span>💡</span>
+      <p><b>Consiglio:</b> dal telefono apri un demo e usa “Aggiungi a schermata Home” del browser: si apre a tutto schermo come un'app.</p>
+    </div>
+  </main>
+  <footer>Attività, recensioni e prenotazioni sono dimostrative · Foto: Unsplash</footer>
+</body>
+</html>

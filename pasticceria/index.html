@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fbf6ef">
+  <title>Pasticceria Aurora · Dolci artigianali dal 1987</title>
+  <meta name="description" content="Pasticceria artigianale: torte su misura, pasticceria fresca e colazioni. Ordina la tua torta online e ritirala quando vuoi.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400;1,9..144,600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="topbar" id="top">
+    <a href="#top" class="logo" aria-label="Pasticceria Aurora, torna su">
+      <span class="logo-mark">A</span>
+      <span class="logo-text">Aurora<small>Pasticceria · 1987</small></span>
+    </a>
+    <nav class="nav" id="nav" aria-label="Navigazione principale">
+      <a href="#specialita">Specialità</a>
+      <a href="#torte">Torte su misura</a>
+      <a href="#storia">La storia</a>
+      <a href="#orari">Orari</a>
+      <a href="#ordina" class="nav-cta">Ordina una torta</a>
+    </nav>
+    <button class="burger" id="burger" aria-label="Apri menu" aria-expanded="false" aria-controls="nav">
+      <span></span><span></span>
+    </button>
+  </header>
+
+  <main>
+    <section class="hero">
+      <img class="hero-img" src="https://images.unsplash.com/photo-1559620192-032c4bc4674e?auto=format&fit=crop&w=1600&q=75" alt="Torta alla crema decorata con more e fiori di lillà">
+      <div class="hero-content">
+        <p class="eyebrow">Pasticceria artigianale</p>
+        <h1>Dolci fatti a mano,<br><em>ogni mattina.</em></h1>
+        <p class="lead">Burro di montagna, uova di cascina e il lievito madre di nonna Rosa. Ordina la tua torta online: la prepariamo per il giorno che scegli tu.</p>
+        <div class="hero-actions">
+          <a href="#ordina" class="btn btn-primary">Ordina la tua torta</a>
+          <a href="#specialita" class="btn btn-ghost">Scopri le vetrine</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="perks" aria-label="I nostri punti di forza">
+      <div class="perk"><span class="perk-ico">🌾</span><div><b>Lievito madre</b><span>Rinfrescato ogni giorno da 37 anni</span></div></div>
+      <div class="perk"><span class="perk-ico">🥚</span><div><b>Filiera corta</b><span>Uova, latte e frutta da aziende vicine</span></div></div>
+      <div class="perk"><span class="perk-ico">🎂</span><div><b>Su ordinazione</b><span>Torte pronte in 48 ore, anche a domicilio</span></div></div>
+    </section>
+
+    <section class="section" id="specialita">
+      <div class="section-head">
+        <p class="eyebrow">Le nostre vetrine</p>
+        <h2>Specialità della casa</h2>
+      </div>
+      <div class="chips" role="tablist" aria-label="Filtra le specialità">
+        <button class="chip is-active" data-filter="tutti" role="tab" aria-selected="true">Tutti</button>
+        <button class="chip" data-filter="torte" role="tab" aria-selected="false">Torte</button>
+        <button class="chip" data-filter="pasticceria" role="tab" aria-selected="false">Pasticceria</button>
+        <button class="chip" data-filter="colazione" role="tab" aria-selected="false">Colazione</button>
+      </div>
+      <div class="products" id="products"></div>
+    </section>
+
+    <section class="feature" id="torte">
+      <div class="feature-img">
+        <img src="https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=1000&q=75" alt="Torta di compleanno a strati colorati con stelle di zucchero" loading="lazy">
+      </div>
+      <div class="feature-body">
+        <p class="eyebrow">Torte su misura</p>
+        <h2>La torta dei tuoi momenti importanti</h2>
+        <p>Compleanni, battesimi, lauree, anniversari. Scegli la base, il numero di persone e la decorazione: ti diciamo subito il prezzo e prepariamo tutto per il giorno del ritiro.</p>
+        <ul class="ticks">
+          <li>Prezzo calcolato all'istante, senza sorprese</li>
+          <li>Scritta e decorazioni personalizzate</li>
+          <li>Varianti senza lattosio e senza glutine</li>
+          <li>Consegna a domicilio in città</li>
+        </ul>
+        <a href="#ordina" class="btn btn-primary">Componi la tua torta</a>
+      </div>
+    </section>
+
+    <section class="section story" id="storia">
+      <div class="story-grid">
+        <div>
+          <p class="eyebrow">Dal 1987</p>
+          <h2>Tre generazioni, un solo laboratorio</h2>
+          <p>Nonna Rosa ha aperto Aurora in un piccolo forno di quartiere. Oggi in laboratorio ci siamo noi nipoti, ma la regola è rimasta la stessa: niente semilavorati, niente scorciatoie. Le creme si fanno all'alba, le sfoglie si girano a mano.</p>
+          <div class="stats">
+            <div><b>37</b><span>anni di forno</span></div>
+            <div><b>60+</b><span>dolci in vetrina</span></div>
+            <div><b>4,9★</b><span>su 1.200 recensioni</span></div>
+          </div>
+        </div>
+        <img src="https://images.unsplash.com/photo-1517433670267-08bbd4be890f?auto=format&fit=crop&w=1000&q=75" alt="Il banco della pasticceria con pane e lievitati appena sfornati" loading="lazy">
+      </div>
+    </section>
+
+    <section class="section reviews" aria-label="Recensioni">
+      <div class="section-head">
+        <p class="eyebrow">Dicono di noi</p>
+        <h2>Le parole dei clienti</h2>
+      </div>
+      <div class="review-track">
+        <figure class="review"><div class="stars">★★★★★</div><blockquote>“Abbiamo ordinato la torta per i 18 anni di nostra figlia dal telefono, in due minuti. Era bellissima e buonissima.”</blockquote><figcaption>Giulia M.</figcaption></figure>
+        <figure class="review"><div class="stars">★★★★★</div><blockquote>“I cornetti della domenica sono un rito di famiglia. La crema pasticcera è quella di una volta.”</blockquote><figcaption>Andrea P.</figcaption></figure>
+        <figure class="review"><div class="stars">★★★★★</div><blockquote>“Millefoglie senza lattosio per mio marito: nessuno a tavola ha notato la differenza.”</blockquote><figcaption>Francesca R.</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- ===== Prenotazione / ordine torta ===== -->
+    <section class="section booking" id="ordina">
+      <div class="section-head">
+        <p class="eyebrow">Ordina online</p>
+        <h2>Componi e prenota la tua torta</h2>
+        <p class="muted">Tre passaggi, meno di un minuto. Paghi al ritiro.</p>
+      </div>
+
+      <div class="wizard" id="wizard">
+        <ol class="steps" aria-label="Avanzamento ordine">
+          <li class="is-current"><span>1</span>Torta</li>
+          <li><span>2</span>Ritiro</li>
+          <li><span>3</span>Dati</li>
+        </ol>
+
+        <form id="orderForm" novalidate>
+          <!-- Step 1 -->
+          <fieldset class="step is-active" data-step="1">
+            <legend class="sr-only">Scegli la torta</legend>
+            <p class="label">Scegli la base</p>
+            <div class="cake-options" id="cakeOptions"></div>
+
+            <div class="row">
+              <div class="field">
+                <span class="label" id="servingsLabel">Persone</span>
+                <div class="stepper" role="group" aria-labelledby="servingsLabel">
+                  <button type="button" data-step-servings="-2" aria-label="Meno persone">−</button>
+                  <output id="servings" aria-live="polite">10</output>
+                  <button type="button" data-step-servings="2" aria-label="Più persone">+</button>
+                </div>
+              </div>
+              <div class="field">
+                <label class="label" for="variant">Variante</label>
+                <select id="variant" name="variant">
+                  <option value="classica">Classica</option>
+                  <option value="senza lattosio">Senza lattosio</option>
+                  <option value="senza glutine">Senza glutine (+10%)</option>
+                </select>
+              </div>
+            </div>
+
+            <p class="label">Extra</p>
+            <div class="extras" id="extras"></div>
+
+            <div class="field">
+              <label class="label" for="writing">Scritta sulla torta <span class="opt">(facoltativa)</span></label>
+              <input id="writing" name="writing" maxlength="40" placeholder="Es. Buon compleanno Sofia!">
+            </div>
+          </fieldset>
+
+          <!-- Step 2 -->
+          <fieldset class="step" data-step="2">
+            <legend class="sr-only">Data e modalità di ritiro</legend>
+            <p class="label">Giorno <span class="opt">(almeno 48 ore di preavviso · lunedì chiuso)</span></p>
+            <div class="days" id="days"></div>
+
+            <p class="label">Fascia oraria</p>
+            <div class="slots" id="slots"></div>
+
+            <p class="label">Come la ricevi?</p>
+            <div class="seg" role="radiogroup" aria-label="Modalità di consegna">
+              <label><input type="radio" name="delivery" value="ritiro" checked><span>🏪 Ritiro in negozio</span></label>
+              <label><input type="radio" name="delivery" value="consegna"><span>🛵 Consegna (+€6)</span></label>
+            </div>
+            <div class="field" id="addressField" hidden>
+              <label class="label" for="address">Indirizzo di consegna</label>
+              <input id="address" name="address" autocomplete="street-address" placeholder="Via, numero civico, città">
+            </div>
+          </fieldset>
+
+          <!-- Step 3 -->
+          <fieldset class="step" data-step="3">
+            <legend class="sr-only">I tuoi dati</legend>
+            <div class="field">
+              <label class="label" for="name">Nome e cognome</label>
+              <input id="name" name="name" autocomplete="name" required placeholder="Mario Rossi">
+            </div>
+            <div class="row">
+              <div class="field">
+                <label class="label" for="phone">Telefono</label>
+                <input id="phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required placeholder="333 123 4567">
+              </div>
+              <div class="field">
+                <label class="label" for="email">Email <span class="opt">(facoltativa)</span></label>
+                <input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="mario@email.it">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label" for="notes">Note e allergie</label>
+              <textarea id="notes" name="notes" rows="3" placeholder="Allergie, colori preferiti, idee per la decorazione…"></textarea>
+            </div>
+            <label class="check"><input type="checkbox" id="privacy" required> <span>Accetto il trattamento dei dati per gestire l'ordine.</span></label>
+          </fieldset>
+
+          <p class="form-error" id="formError" role="alert"></p>
+
+          <div class="summary" id="summary" aria-live="polite"></div>
+
+          <div class="wizard-nav">
+            <button type="button" class="btn btn-ghost-dark" id="backBtn" hidden>Indietro</button>
+            <button type="button" class="btn btn-primary" id="nextBtn">Continua</button>
+          </div>
+        </form>
+
+        <div class="confirm" id="confirm" hidden></div>
+      </div>
+
+      <div class="my-orders" id="myOrders" hidden>
+        <h3>I tuoi ordini</h3>
+        <ul id="ordersList"></ul>
+      </div>
+    </section>
+
+    <section class="section info" id="orari">
+      <div class="info-grid">
+        <div class="info-card">
+          <h3>Orari</h3>
+          <dl class="hours">
+            <div><dt>Lunedì</dt><dd>Chiuso</dd></div>
+            <div><dt>Mar – Ven</dt><dd>7:00 – 19:30</dd></div>
+            <div><dt>Sabato</dt><dd>7:00 – 20:00</dd></div>
+            <div><dt>Domenica</dt><dd>7:30 – 13:30</dd></div>
+          </dl>
+        </div>
+        <div class="info-card">
+          <h3>Dove siamo</h3>
+          <p>Via dei Fiori 18<br>Centro storico</p>
+          <p><a href="tel:+390001234567">+39 000 123 4567</a><br><a href="mailto:ordini@pasticceria-aurora.demo">ordini@pasticceria-aurora.demo</a></p>
+          <a class="btn btn-ghost-dark btn-sm" href="https://www.google.com/maps" target="_blank" rel="noopener">Apri in Maps</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p><b>Pasticceria Aurora</b> · Via dei Fiori 18 · P.IVA 00000000000</p>
+    <p class="demo-note">Sito dimostrativo: attività, recensioni e ordini sono di esempio.</p>
+  </footer>
+
+  <div class="dock" id="dock">
+    <a href="tel:+390001234567" class="dock-call" aria-label="Chiama la pasticceria">📞</a>
+    <a href="#ordina" class="btn btn-primary dock-btn">Ordina una torta</a>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

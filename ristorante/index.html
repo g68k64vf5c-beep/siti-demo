@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#13110f">
+  <title>Osteria del Borgo · Cucina di territorio</title>
+  <meta name="description" content="Osteria del Borgo: pasta fatta a mano, carni alla brace e una cantina di 300 etichette. Prenota il tuo tavolo online in pochi secondi.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,500;0,600;0,700;1,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="topbar" id="top">
+    <a href="#top" class="logo" aria-label="Osteria del Borgo, torna su">
+      <span class="logo-small">Osteria</span>
+      <span class="logo-big">del Borgo</span>
+    </a>
+    <nav class="nav" aria-label="Navigazione principale">
+      <a href="#cucina">La cucina</a>
+      <a href="#menu">Menu</a>
+      <a href="#galleria">Il locale</a>
+      <a href="#contatti">Contatti</a>
+    </nav>
+    <div class="top-actions">
+      <button class="icon-btn" id="myResBtn" aria-label="Le mie prenotazioni" hidden>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4.5" width="18" height="16" rx="2.5"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg>
+        <span class="badge" id="resCount">0</span>
+      </button>
+      <button class="btn btn-gold btn-sm" data-open-booking>Prenota</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <img class="hero-img" src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1600&q=75" alt="Piatto gourmet servito su una tavola apparecchiata con calici di vino">
+      <div class="hero-content">
+        <p class="eyebrow">Cucina di territorio · dal 1962</p>
+        <h1>Sapori di casa,<br><em>a lume di candela.</em></h1>
+        <p class="lead">Pasta tirata a mano ogni mattina, carni alla brace di legna e una cantina con oltre 300 etichette.</p>
+        <button class="btn btn-gold btn-lg" data-open-booking>Prenota un tavolo</button>
+        <a href="#menu" class="link-arrow">Sfoglia il menu →</a>
+      </div>
+    </section>
+
+    <section class="infobar" aria-label="Informazioni rapide">
+      <div><span class="dot" id="openDot"></span><b id="openState">Aperto stasera</b><small id="openHours">19:00 – 23:30</small></div>
+      <div><b>★ 4,8</b><small>2.340 recensioni</small></div>
+      <div><b>Via del Borgo 7</b><small>Centro storico</small></div>
+    </section>
+
+    <section class="section about" id="cucina">
+      <div class="about-media">
+        <img src="https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=900&q=75" alt="Tagliatelle fatte a mano con funghi e carne" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=600&q=75" alt="Brindisi con calici di vino rosso" loading="lazy">
+      </div>
+      <div class="about-body">
+        <p class="eyebrow">La nostra cucina</p>
+        <h2>Tre generazioni ai fornelli, <em>una sola idea</em></h2>
+        <p>Dal 1962 cuciniamo quello che il territorio ci offre stagione dopo stagione. Verdure dall'orto di famiglia, farine macinate a pietra, carni di allevatori che conosciamo per nome.</p>
+        <p class="signature">— Chef Lorenzo Ferri</p>
+      </div>
+    </section>
+
+    <section class="section signature-dishes" aria-label="Piatti firma">
+      <div class="section-head">
+        <p class="eyebrow">Da non perdere</p>
+        <h2>I piatti firma</h2>
+      </div>
+      <div class="dish-track">
+        <article class="dish"><img src="https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=700&q=70" alt="" loading="lazy"><div><h3>Tagliatelle al ragù bianco</h3><p>Funghi porcini e salsiccia di cinta</p><span>€16</span></div></article>
+        <article class="dish"><img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=700&q=70" alt="" loading="lazy"><div><h3>Tagliata alla brace</h3><p>Manzo frollato 30 giorni, patate al rosmarino</p><span>€24</span></div></article>
+        <article class="dish"><img src="https://images.unsplash.com/photo-1600628421055-4d30de868b8f?auto=format&fit=crop&w=700&q=70" alt="" loading="lazy"><div><h3>Pizza crudo e rucola</h3><p>Impasto a 72 ore, crudo di Parma 24 mesi</p><span>€13</span></div></article>
+        <article class="dish"><img src="https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=700&q=70" alt="" loading="lazy"><div><h3>Farfalle al pesto</h3><p>Basilico dell'orto e pomodorini confit</p><span>€14</span></div></article>
+      </div>
+    </section>
+
+    <section class="section menu" id="menu">
+      <div class="section-head center">
+        <p class="eyebrow">Il menu</p>
+        <h2>Alla carta</h2>
+      </div>
+      <div class="tabs" role="tablist" aria-label="Sezioni del menu" id="menuTabs"></div>
+      <div class="menu-list" id="menuList" role="tabpanel"></div>
+      <p class="menu-note">Coperto €3 · Menu degustazione 6 portate €55 · Chiedi al personale per allergeni e intolleranze</p>
+    </section>
+
+    <section class="cta-band">
+      <img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=1600&q=70" alt="" loading="lazy">
+      <div class="cta-band-content">
+        <h2>La terrazza è aperta<br><em>fino a fine ottobre</em></h2>
+        <p>Pochi tavoli, tramonto incluso. Prenota con anticipo.</p>
+        <button class="btn btn-gold" data-open-booking data-area="terrazza">Prenota in terrazza</button>
+      </div>
+    </section>
+
+    <section class="section gallery" id="galleria">
+      <div class="section-head">
+        <p class="eyebrow">Il locale</p>
+        <h2>Due sale e una terrazza</h2>
+      </div>
+      <div class="gallery-grid">
+        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=900&q=70" alt="La sala principale con travi a vista" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1481833761820-0509d3217039?auto=format&fit=crop&w=600&q=70" alt="Il bancone del bar di sera" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=600&q=70" alt="La sala interna apparecchiata" loading="lazy">
+        <img src="https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?auto=format&fit=crop&w=900&q=70" alt="Tavolata condivisa tra amici" loading="lazy">
+      </div>
+    </section>
+
+    <section class="section reviews" aria-label="Recensioni">
+      <div class="review-track">
+        <figure><blockquote>“Le tagliatelle migliori della provincia. Prenotato dal telefono in trenta secondi, tavolo in terrazza perfetto.”</blockquote><figcaption>★★★★★ · Marco T.</figcaption></figure>
+        <figure><blockquote>“Abbiamo festeggiato l'anniversario: si erano segnati l'occasione e ci hanno portato un dolce a sorpresa.”</blockquote><figcaption>★★★★★ · Elena &amp; Paolo</figcaption></figure>
+        <figure><blockquote>“Carta dei vini da veri appassionati, servizio attento ma mai invadente.”</blockquote><figcaption>★★★★★ · Stefano G.</figcaption></figure>
+      </div>
+    </section>
+
+    <section class="section contacts" id="contatti">
+      <div class="contacts-grid">
+        <div>
+          <p class="eyebrow">Orari</p>
+          <dl class="hours">
+            <div><dt>Lunedì</dt><dd>19:00 – 23:30</dd></div>
+            <div><dt>Martedì</dt><dd class="closed">Chiuso</dd></div>
+            <div><dt>Mer – Ven</dt><dd>12:00 – 14:30 · 19:00 – 23:30</dd></div>
+            <div><dt>Sab – Dom</dt><dd>12:00 – 15:00 · 19:00 – 24:00</dd></div>
+          </dl>
+        </div>
+        <div>
+          <p class="eyebrow">Contatti</p>
+          <p class="contact-lines">Via del Borgo 7, Centro storico<br><a href="tel:+390009876543">+39 000 987 6543</a><br><a href="mailto:tavoli@osteriadelborgo.demo">tavoli@osteriadelborgo.demo</a></p>
+          <a class="btn btn-outline btn-sm" href="https://www.google.com/maps" target="_blank" rel="noopener">Indicazioni stradali</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Osteria del Borgo · P.IVA 00000000000</p>
+    <p class="demo-note">Sito dimostrativo: locale, recensioni e prenotazioni sono di esempio.</p>
+  </footer>
+
+  <div class="dock" id="dock">
+    <a href="tel:+390009876543" class="dock-icon" aria-label="Chiama">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 3h4l2 5-2.5 1.5a11 11 0 0 0 6 6L16 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 5a2 2 0 0 1 2-2"/></svg>
+    </a>
+    <button class="btn btn-gold dock-btn" data-open-booking>Prenota un tavolo</button>
+  </div>
+
+  <!-- ===== Booking sheet ===== -->
+  <div class="sheet-backdrop" id="backdrop" hidden></div>
+  <section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" aria-hidden="true">
+    <div class="sheet-grip" aria-hidden="true"></div>
+    <header class="sheet-head">
+      <button class="icon-btn" id="sheetBack" aria-label="Indietro" hidden>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <h2 id="sheetTitle">Prenota un tavolo</h2>
+      <button class="icon-btn" id="sheetClose" aria-label="Chiudi">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </header>
+
+    <div class="sheet-body" id="sheetBody">
+      <!-- Pane 1: quando e quanti -->
+      <div class="pane is-active" data-pane="1">
+        <div class="block">
+          <p class="label">Quante persone?</p>
+          <div class="guests" id="guests"></div>
+          <p class="hint" id="groupHint" hidden>Per gruppi oltre 10 persone ti richiamiamo noi per organizzare la sala.</p>
+        </div>
+
+        <div class="block">
+          <p class="label">Quando?</p>
+          <div class="days" id="days"></div>
+        </div>
+
+        <div class="block">
+          <div class="seg" role="radiogroup" aria-label="Servizio">
+            <label><input type="radio" name="service" value="pranzo"><span>☀️ Pranzo</span></label>
+            <label><input type="radio" name="service" value="cena" checked><span>🌙 Cena</span></label>
+          </div>
+          <div class="times" id="times"></div>
+          <p class="legend"><span class="lg lg-few"></span> Ultimi tavoli <span class="lg lg-full"></span> Completo</p>
+        </div>
+
+        <div class="block">
+          <p class="label">Dove preferisci sederti?</p>
+          <div class="areas" id="areas">
+            <label><input type="radio" name="area" value="sala" checked><span><b>Sala</b><small>Travi a vista, camino</small></span></label>
+            <label><input type="radio" name="area" value="terrazza"><span><b>Terrazza</b><small>Vista sul borgo</small></span></label>
+            <label><input type="radio" name="area" value="cantina"><span><b>Cantina</b><small>Tavoli riservati</small></span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pane 2: dati -->
+      <div class="pane" data-pane="2">
+        <div class="recap" id="recap"></div>
+
+        <div class="block">
+          <p class="label">È un'occasione speciale?</p>
+          <div class="occasions" id="occasions">
+            <label><input type="radio" name="occasion" value="" checked><span>Nessuna</span></label>
+            <label><input type="radio" name="occasion" value="Compleanno"><span>🎂 Compleanno</span></label>
+            <label><input type="radio" name="occasion" value="Anniversario"><span>💍 Anniversario</span></label>
+            <label><input type="radio" name="occasion" value="Cena di lavoro"><span>💼 Lavoro</span></label>
+          </div>
+        </div>
+
+        <div class="block fields">
+          <div class="field"><label for="rName">Nome e cognome</label><input id="rName" autocomplete="name" placeholder="Mario Rossi"></div>
+          <div class="field"><label for="rPhone">Telefono</label><input id="rPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="333 123 4567"></div>
+          <div class="field"><label for="rEmail">Email <span class="opt">(per la conferma)</span></label><input id="rEmail" type="email" inputmode="email" autocomplete="email" placeholder="mario@email.it"></div>
+          <div class="field"><label for="rNotes">Allergie o richieste</label><textarea id="rNotes" rows="2" placeholder="Es. seggiolone, celiachia, tavolo tranquillo…"></textarea></div>
+          <label class="check"><input type="checkbox" id="rPrivacy"><span>Accetto il trattamento dei dati per gestire la prenotazione.</span></label>
+        </div>
+      </div>
+
+      <!-- Pane 3: conferma -->
+      <div class="pane" data-pane="3" id="donePane"></div>
+
+      <!-- Pane 4: le mie prenotazioni -->
+      <div class="pane" data-pane="4">
+        <ul class="res-list" id="resList"></ul>
+      </div>
+    </div>
+
+    <footer class="sheet-foot" id="sheetFoot">
+      <p class="form-error" id="formError" role="alert"></p>
+      <button class="btn btn-gold btn-block" id="sheetNext">Continua</button>
+    </footer>
+  </section>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
