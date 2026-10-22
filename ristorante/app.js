@@ -2,6 +2,9 @@
   const $ = s => document.querySelector(s);
   const $$ = s => [...document.querySelectorAll(s)];
   const STORE_KEY = "borgo_reservations";
+  // URL della Web App di Google Apps Script (vedi google-calendar/LEGGIMI.md).
+  // Vuoto = modalità demo: disponibilità simulata e prenotazioni solo nel browser.
+  const CALENDAR_ENDPOINT = "";
 
   /* ---------- Opening hours (0 = domenica) ---------- */
   const HOURS = {
@@ -128,7 +131,23 @@
     const lunch = $("[name=service][value=pranzo]");
     lunch.disabled = !h.pranzo.length;
     if (lunch.disabled && state.service === "pranzo") { state.service = "cena"; $("[name=service][value=cena]").checked = true; }
+    CALENDAR_ENDPOINT ? loadAvailability(dateIso) : renderTimes();
+  }
+
+  // Real availability read from Google Calendar, cached per day while the sheet is open
+  const remote = {};
+  async function loadAvailability(dateIso, force = false) {
+    if (remote[dateIso] && !remote[dateIso].error && !force) return renderTimes();
+    remote[dateIso] = { loading: true };
     renderTimes();
+    try {
+      const res = await fetch(`${CALENDAR_ENDPOINT}?date=${dateIso}`);
+      const data = await res.json();
+      remote[dateIso] = data.ok ? { data } : { error: true };
+    } catch {
+      remote[dateIso] = { error: true };
+    }
+    if (state.date === dateIso) renderTimes();
   }
 
   $$("[name=service]").forEach(r => r.addEventListener("change", () => { state.service = r.value; state.time = null; renderTimes(); }));
@@ -137,6 +156,13 @@
   // Deterministic availability so the demo feels real
   const hash = s => { let h = 7; for (const c of s) h = (h * 33 + c.charCodeAt(0)) >>> 0; return h; };
   function availability(dateIso, time) {
+    const r = remote[dateIso];
+    if (r && r.data) {
+      const d = r.data;
+      if (d.closed || d.blocked.some(b => time >= b.from && time < b.to)) return "full";
+      const left = d.capacity - (d.slots[time] || 0);
+      return left < state.guests ? "full" : left < d.capacity * 0.35 ? "few" : "ok";
+    }
     const h = hash(dateIso + time + (state.guests > 4 ? "L" : "S")) % 10;
     return h < 2 ? "full" : h < 4 ? "few" : "ok";
   }
@@ -144,6 +170,10 @@
   function renderTimes() {
     const el = $("#times");
     if (!state.date) { el.innerHTML = `<p class="empty">Scegli un giorno per vedere gli orari liberi.</p>`; return; }
+    const r = CALENDAR_ENDPOINT && remote[state.date];
+    if (r && r.loading) { el.innerHTML = `<p class="empty">Controllo la disponibilità…</p>`; return; }
+    if (r && r.error) { el.innerHTML = `<p class="empty">Non riesco a leggere la disponibilità. <button type="button" class="retry" data-retry>Riprova</button></p>`; return; }
+    if (r && r.data.closed) { el.innerHTML = `<p class="empty">In questa data il locale è chiuso.</p>`; return; }
     const list = HOURS[fromIso(state.date).getDay()][state.service];
     const isToday = state.date === iso(new Date());
     const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
@@ -155,6 +185,7 @@
     }).join("") || `<p class="empty">Nessun orario disponibile.</p>`;
   }
   $("#times").addEventListener("click", e => {
+    if (e.target.closest("[data-retry]")) return loadAvailability(state.date, true);
     const b = e.target.closest(".time"); if (!b || b.disabled) return;
     state.time = b.dataset.t;
     $$(".time").forEach(x => x.classList.toggle("is-selected", x === b));
@@ -168,7 +199,9 @@
   function openSheet(pane = 1, area) {
     lastFocus = document.activeElement;
     if (area) { state.area = area; $(`[name=area][value=${area}]`).checked = true; }
+    for (const k in remote) delete remote[k];
     if (!state.date) { const first = $(".day:not([disabled])"); if (first) selectDay(first.dataset.date); }
+    else if (CALENDAR_ENDPOINT) loadAvailability(state.date);
     paintGuests();
     showPane(pane);
     backdrop.hidden = false;
@@ -246,7 +279,7 @@
   const load = () => { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch { return []; } };
   const save = l => { try { localStorage.setItem(STORE_KEY, JSON.stringify(l)); } catch {} updateBadge(); };
 
-  function confirmBooking() {
+  async function confirmBooking() {
     const r = {
       code: "BRG-" + Math.floor(1000 + Math.random() * 9000),
       guests: state.guests, date: state.date, service: state.service, time: state.time, area: state.area,
@@ -254,6 +287,35 @@
       name: $("#rName").value.trim(), phone: $("#rPhone").value.trim(), email: $("#rEmail").value.trim(),
       createdAt: new Date().toISOString(),
     };
+
+    if (CALENDAR_ENDPOINT) {
+      nextBtn.disabled = true;
+      nextBtn.textContent = "Invio in corso…";
+      let out;
+      try {
+        // text/plain body keeps this a "simple" request, so Apps Script needs no CORS preflight
+        const res = await fetch(CALENDAR_ENDPOINT, { method: "POST", body: JSON.stringify({ action: "book", ...r }) });
+        out = await res.json();
+      } catch {
+        out = { ok: false, error: "network" };
+      }
+      nextBtn.disabled = false;
+      nextBtn.textContent = "Conferma prenotazione";
+      if (!out.ok) {
+        if (out.error === "full" || out.error === "closed") {
+          state.time = null;
+          showPane(1);
+          loadAvailability(r.date, true);
+          errEl.textContent = "Quell'orario si è appena riempito: scegline un altro.";
+        } else {
+          errEl.textContent = "Invio non riuscito. Controlla la connessione e riprova.";
+        }
+        return;
+      }
+      r.code = out.code;
+      r.remote = true;
+    }
+
     const list = load(); list.push(r);
     list.sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time));
     save(list);
@@ -302,9 +364,21 @@
       </li>`;
     }).join("") : `<li class="res-empty">Non hai ancora prenotazioni.</li>`;
   }
-  $("#resList").addEventListener("click", e => {
+  $("#resList").addEventListener("click", async e => {
     const code = e.target.dataset.cancel;
     if (!code || !confirm("Vuoi annullare la prenotazione?")) return;
+    const r = load().find(x => x.code === code);
+    if (CALENDAR_ENDPOINT && r && r.remote) {
+      let out;
+      try {
+        const res = await fetch(CALENDAR_ENDPOINT, { method: "POST", body: JSON.stringify({ action: "cancel", code, phone: r.phone }) });
+        out = await res.json();
+      } catch {
+        out = { ok: false };
+      }
+      // not_found = già cancellata dal titolare nel calendario: va tolta anche qui
+      if (!out.ok && out.error !== "not_found") return toast("Annullamento non riuscito, riprova");
+    }
     save(load().filter(r => r.code !== code));
     renderList();
     toast("Prenotazione annullata");
@@ -338,6 +412,7 @@
   let tt;
   function toast(m) { const t = $("#toast"); t.textContent = m; t.classList.add("is-on"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("is-on"), 2400); }
 
+  $("#liveTag").hidden = !CALENDAR_ENDPOINT;
   paintGuests();
   renderTimes();
   updateBadge();

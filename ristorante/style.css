@@ -222,6 +222,9 @@ h1 em, h2 em { font-style: italic; font-weight: 500; color: var(--gold-2); }
 .lg { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 .lg-few { background: var(--warn); }
 .lg-full { background: var(--text-soft); opacity: .4; margin-left: 10px; }
+.live { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; color: var(--ok); }
+.live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--ok); animation: pulse 2s infinite; }
+.retry { background: none; border: 0; color: var(--gold); text-decoration: underline; cursor: pointer; padding: 4px; }
 
 .areas { display: grid; gap: 8px; }
 .areas label { position: relative; }
