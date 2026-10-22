@@ -11,6 +11,9 @@
  *   POST {"action":"cancel", code, phone}  → cancella l'ordine
  */
 
+// Cambia a ogni modifica: il sito di prova lo legge per sapere quale versione è online
+const SCRIPT_VERSION = 2;
+
 const CONFIG = {
   calendarName: "Ordini Pasticceria Aurora",
   timeZone: "Europe/Rome",
@@ -47,7 +50,7 @@ function doGet(e) {
   const p = (e && e.parameter) || {};
   if (!isIsoDate(p.from)) return json({ ok: false, error: "bad_date" });
   const days = Math.min(31, Math.max(1, Number(p.days) || 1));
-  return json(Object.assign({ ok: true }, schedule(p.from, days)));
+  return json(Object.assign({ ok: true, version: SCRIPT_VERSION }, schedule(p.from, days)));
 }
 
 function doPost(e) {

@@ -11,6 +11,9 @@
  *   POST {"action":"cancel", code, phone} → cancella la prenotazione
  */
 
+// Cambia a ogni modifica: il sito di prova lo legge per sapere quale versione è online
+const SCRIPT_VERSION = 2;
+
 const CONFIG = {
   calendarName: "Prenotazioni Osteria del Borgo",
   timeZone: "Europe/Rome",
@@ -36,7 +39,7 @@ const HOURS = {
 function doGet(e) {
   const date = String((e && e.parameter && e.parameter.date) || "");
   if (!isIsoDate(date)) return json({ ok: false, error: "bad_date" });
-  return json(Object.assign({ ok: true }, availability(date)));
+  return json(Object.assign({ ok: true, version: SCRIPT_VERSION }, availability(date)));
 }
 
 function doPost(e) {
