@@ -2,6 +2,9 @@
   const $ = s => document.querySelector(s);
   const $$ = s => [...document.querySelectorAll(s)];
   const STORE_KEY = "fl_appointments";
+  // URL della Web App di Google Apps Script (vedi google-calendar/LEGGIMI.md).
+  // Vuoto = modalità demo: agenda simulata e appuntamenti solo nel browser.
+  const CALENDAR_ENDPOINT = "";
 
   /* ---------- Data ---------- */
   const SERVICES = [
@@ -39,19 +42,27 @@
   const save = l => { try { localStorage.setItem(STORE_KEY, JSON.stringify(l)); } catch {} refreshBadge(); };
 
   /* ---------- Availability engine ---------- */
+  // Agenda letta da Google Calendar: { closed: [date], busy: { date: { barber: [[from, to]] } } } in minuti
+  const remote = { data: null, error: false };
+
   function dayUnits(dateIso) {
     const o = OPEN[fromIso(dateIso).getDay()];
-    if (!o) return null;
+    if (!o || (remote.data && remote.data.closed.includes(dateIso))) return null;
     const start = toMin(o[0]), end = toMin(o[1]);
     return { start, count: Math.floor((end - start) / UNIT) };
   }
   // A unit is busy if pseudo-randomly taken (stable per day/barber) or booked by the visitor
   function isBusy(barber, dateIso, unitStartMin) {
+    if (CALENDAR_ENDPOINT) {
+      const day = remote.data && remote.data.busy[dateIso];
+      return ((day && day[barber]) || []).some(([s, e]) => s < unitStartMin + UNIT && e > unitStartMin);
+    }
     if (hash(`${barber}|${dateIso}|${unitStartMin}`) % 100 < 42) return true;
     return load().some(a => a.barber === barber && a.date === dateIso &&
       unitStartMin >= toMin(a.start) && unitStartMin < toMin(a.start) + Math.ceil(a.minutes / UNIT) * UNIT);
   }
   function fits(barber, dateIso, startMin, units) {
+    if (CALENDAR_ENDPOINT && !remote.data) return false;
     const d = dayUnits(dateIso);
     if (!d || startMin + units * UNIT > d.start + d.count * UNIT) return false;
     const now = new Date();
@@ -89,13 +100,34 @@
       <div><h3>${b.name}</h3><p>${b.role}</p><div class="tags">${b.tags.map(t => `<span>${t}</span>`).join("")}</div></div>
       <button class="btn btn-outline btn-sm member-book" data-open-booking data-barber="${b.id}">Prenota</button></article>`).join("");
 
-  (function heroSlot() {
+  function heroSlot() {
+    if (CALENDAR_ENDPOINT && !remote.data) {
+      $("#nextSlot").innerHTML = `<span class="pulse"></span><span>${remote.error ? "Agenda non raggiungibile: chiamaci" : "Controllo l'agenda…"}</span>`;
+      return;
+    }
     const r = nextFree("any", 1);
     const b = r && BARBERS.find(x => x.id === r.barber);
     $("#nextSlot").innerHTML = r
       ? `<span class="pulse"></span><span>Prossimo posto libero: <b>${whenLabel(r)} alle ${r.start}</b> con ${b.name}</span>`
       : `<span class="pulse"></span><span>Agenda piena: chiamaci per un buco last minute</span>`;
-  })();
+  }
+  heroSlot();
+
+  async function loadRemote() {
+    if (!CALENDAR_ENDPOINT) return;
+    try {
+      const res = await fetch(`${CALENDAR_ENDPOINT}?from=${iso(new Date())}&days=21`);
+      const data = await res.json();
+      if (!data.ok) throw data;
+      remote.data = data;
+      remote.error = false;
+    } catch {
+      remote.error = !remote.data;
+    }
+    heroSlot();
+    if (state.view === 2) renderBarbers();
+    if (state.view === 3) { renderDays(); renderSlots(); }
+  }
 
   const topbar = $(".topbar");
   const onScroll = () => topbar.classList.toggle("is-scrolled", scrollY > 30);
@@ -142,7 +174,7 @@
   const DAYS = [...Array(21)].map((_, i) => { const d = new Date(base); d.setDate(base.getDate() + i); return d; });
   function renderDays() {
     $("#days").innerHTML = DAYS.map((d, i) => {
-      const closed = !OPEN[d.getDay()];
+      const closed = !dayUnits(iso(d));
       return `<button type="button" class="day ${iso(d) === state.date ? "is-selected" : ""}" data-date="${iso(d)}" ${closed ? "disabled aria-label='Chiuso'" : ""}>
         <small>${i === 0 ? "Oggi" : wdFmt.format(d).replace(".", "")}</small><b>${d.getDate()}</b></button>`;
     }).join("");
@@ -155,6 +187,12 @@
   });
   function renderSlots() {
     $("#calMonth").textContent = cap(monFmt.format(state.date ? fromIso(state.date) : new Date()));
+    if (CALENDAR_ENDPOINT && !remote.data) {
+      $("#slotGroups").innerHTML = remote.error
+        ? `<p class="no-slots">Non riesco a leggere l'agenda. <button type="button" class="retry" data-retry>Riprova</button></p>`
+        : `<p class="no-slots">Controllo l'agenda…</p>`;
+      return;
+    }
     const du = state.date && dayUnits(state.date);
     if (!du) { $("#slotGroups").innerHTML = `<p class="no-slots">Scegli un giorno.</p>`; return; }
     const { units } = totals();
@@ -172,6 +210,7 @@
       : `<p class="no-slots">Nessun posto libero in questa giornata. Prova un altro giorno.</p>`;
   }
   $("#slotGroups").addEventListener("click", e => {
+    if (e.target.closest("[data-retry]")) { remote.error = false; renderSlots(); return loadRemote(); }
     const b = e.target.closest(".slot"); if (!b || b.disabled) return;
     state.start = b.dataset.t;
     $$(".slot").forEach(x => x.classList.toggle("is-selected", x === b));
@@ -203,6 +242,7 @@
     lastFocus = document.activeElement;
     if (opts.service) { state.services.add(opts.service); const c = $(`#svcList input[value=${opts.service}]`); if (c) c.checked = true; }
     if (opts.barber) state.barber = opts.barber;
+    loadRemote();
     go(view);
     app.classList.add("is-open");
     app.setAttribute("aria-hidden", "false");
@@ -265,16 +305,42 @@
     go(v + 1);
   });
 
-  function submit() {
+  async function submit() {
     $$(".is-invalid").forEach(x => x.classList.remove("is-invalid"));
     const n = $("#bName"), p = $("#bPhone");
     if (n.value.trim().length < 2) { n.classList.add("is-invalid"); n.focus(); return (errEl.textContent = "Dicci come ti chiami."); }
     if (p.value.replace(/\D/g, "").length < 8) { p.classList.add("is-invalid"); p.focus(); return (errEl.textContent = "Inserisci un numero di cellulare valido."); }
     if (!$("#bPrivacy").checked) return (errEl.textContent = "Devi accettare il trattamento dei dati.");
     const d = draft();
-    if (!d.barber) { errEl.textContent = "Questo orario è appena stato preso. Scegline un altro."; return go(3); }
+    const taken = () => { state.start = null; go(3); errEl.textContent = "Questo orario è appena stato preso. Scegline un altro."; };
+    if (!d.barber) return taken();
     const a = { code: "FL-" + Math.floor(1000 + Math.random() * 9000), ...d, name: n.value.trim(), phone: p.value.trim(),
       notes: $("#bNotes").value.trim(), reminder: $("#bReminder").checked, createdAt: new Date().toISOString() };
+
+    if (CALENDAR_ENDPOINT) {
+      nextBtn.disabled = true;
+      nextBtn.textContent = "Invio…";
+      let out;
+      try {
+        // text/plain body keeps this a "simple" request, so Apps Script needs no CORS preflight
+        const res = await fetch(CALENDAR_ENDPOINT, { method: "POST", body: JSON.stringify({
+          action: "book", services: d.services, barber: state.barber, date: d.date, start: d.start,
+          name: a.name, phone: a.phone, notes: a.notes, reminder: a.reminder }) });
+        out = await res.json();
+      } catch {
+        out = { ok: false, error: "network" };
+      }
+      nextBtn.disabled = false;
+      updateFoot();
+      if (!out.ok) {
+        if (out.error === "busy" || out.error === "closed") { await loadRemote(); return taken(); }
+        errEl.textContent = "Invio non riuscito. Controlla la connessione e riprova.";
+        return;
+      }
+      Object.assign(a, { code: out.code, barber: out.barber, remote: true });
+      loadRemote();
+    }
+
     const list = load(); list.push(a);
     list.sort((x, y) => (x.date + x.start).localeCompare(y.date + y.start));
     save(list);
@@ -314,9 +380,22 @@
         <button class="appt-cancel" data-cancel="${a.code}">Annulla</button></li>`;
     }).join("") : `<li class="appt-empty"><b>Agenda vuota</b>Prenota il tuo primo appuntamento: ci vogliono 30 secondi.</li>`;
   }
-  $("#apptList").addEventListener("click", e => {
+  $("#apptList").addEventListener("click", async e => {
     const code = e.target.dataset.cancel;
     if (!code || !confirm("Vuoi annullare l'appuntamento?")) return;
+    const a = load().find(x => x.code === code);
+    if (CALENDAR_ENDPOINT && a && a.remote) {
+      let out;
+      try {
+        const res = await fetch(CALENDAR_ENDPOINT, { method: "POST", body: JSON.stringify({ action: "cancel", code, phone: a.phone }) });
+        out = await res.json();
+      } catch {
+        out = { ok: false };
+      }
+      // not_found = già cancellato dal barbiere nel calendario: va tolto anche qui
+      if (!out.ok && out.error !== "not_found") return toast("Annullamento non riuscito, riprova");
+      loadRemote();
+    }
     save(load().filter(a => a.code !== code));
     renderAppts();
     toast("Appuntamento annullato");
@@ -343,4 +422,5 @@
 
   refreshBadge();
   updateFoot();
+  loadRemote();
 })();

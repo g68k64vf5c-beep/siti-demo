@@ -11,8 +11,12 @@ Tre siti dimostrativi, pensati per lo smartphone, con prenotazione integrata:
 Sono siti statici (HTML, CSS e JavaScript, senza dipendenze) pubblicati con GitHub Pages.
 Le prenotazioni sono simulate e restano salvate solo nel browser di chi le fa (`localStorage`).
 
-Il ristorante si può collegare a Google Calendar (prenotazioni nel calendario del locale e disponibilità
-reale): guida in [`ristorante/google-calendar/LEGGIMI.md`](ristorante/google-calendar/LEGGIMI.md).
+Ogni sito si può collegare a Google Calendar (prenotazioni nel calendario del locale e disponibilità reale),
+con uno script Google Apps Script gratuito:
+
+- Ristorante: [`ristorante/google-calendar/LEGGIMI.md`](ristorante/google-calendar/LEGGIMI.md) (già collegato nel demo)
+- Barberia: [`barberia/google-calendar/LEGGIMI.md`](barberia/google-calendar/LEGGIMI.md)
+- Pasticceria: [`pasticceria/google-calendar/LEGGIMI.md`](pasticceria/google-calendar/LEGGIMI.md)
 
 Per provarli in locale:
 

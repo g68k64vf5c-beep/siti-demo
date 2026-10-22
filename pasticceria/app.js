@@ -3,6 +3,9 @@
   const euro = n => n.toLocaleString("it-IT", { style: "currency", currency: "EUR", minimumFractionDigits: n % 1 ? 2 : 0 });
   const $ = s => document.querySelector(s);
   const STORE_KEY = "aurora_orders";
+  // URL della Web App di Google Apps Script (vedi google-calendar/LEGGIMI.md).
+  // Vuoto = modalità demo: disponibilità simulata e ordini solo nel browser.
+  const CALENDAR_ENDPOINT = "";
 
   /* ---------- Data ---------- */
   const products = [
@@ -108,8 +111,14 @@
   const iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   const fromIso = s => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
 
+  // Ordini già presi, letti da Google Calendar: { closed, slots: { date: { slot: n } }, orders: { date: n }, perSlot, perDay }
+  const remote = { data: null, error: false };
+  const dayFull = dateIso => !!remote.data &&
+    (remote.data.closed.includes(dateIso) || (remote.data.orders[dateIso] || 0) >= remote.data.perDay);
+
   // Deterministic "already full" slots so the demo looks realistic
   const isFull = (dateIso, i) => {
+    if (remote.data) return ((remote.data.slots[dateIso] || {})[SLOTS[i]] || 0) >= remote.data.perSlot;
     let h = 0;
     for (const ch of dateIso + i) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
     return h % 5 === 0;
@@ -119,10 +128,35 @@
   const start = new Date(); start.setHours(0, 0, 0, 0); start.setDate(start.getDate() + 2);
   for (let i = 0; i < 21; i++) { const d = new Date(start); d.setDate(start.getDate() + i); days.push(d); }
 
-  $("#days").innerHTML = days.map(d => `
-    <button type="button" class="day" data-date="${iso(d)}" ${d.getDay() === 1 ? "disabled aria-label='Lunedì, chiuso'" : ""}>
-      <small>${dayFmt.format(d).replace(".", "")}</small><b>${d.getDate()}</b><em>${monFmt.format(d).replace(".", "")}</em>
-    </button>`).join("");
+  function renderDays() {
+    $("#days").innerHTML = days.map(d => {
+      const di = iso(d), monday = d.getDay() === 1, full = !monday && dayFull(di);
+      const closed = full && remote.data.closed.includes(di);
+      return `<button type="button" class="day ${di === state.date ? "is-selected" : ""}" data-date="${di}" ${monday || full ? `disabled aria-label="${monday ? "Lunedì, chiuso" : closed ? "Chiuso" : "Completo"}"` : ""}>
+        <small>${dayFmt.format(d).replace(".", "")}</small><b>${d.getDate()}</b><em>${closed ? "chiuso" : full ? "pieno" : monFmt.format(d).replace(".", "")}</em>
+      </button>`;
+    }).join("");
+  }
+  renderDays();
+
+  async function loadRemote() {
+    if (!CALENDAR_ENDPOINT) return;
+    try {
+      const res = await fetch(`${CALENDAR_ENDPOINT}?from=${iso(days[0])}&days=${days.length}`);
+      const data = await res.json();
+      if (!data.ok) throw data;
+      remote.data = data;
+      remote.error = false;
+    } catch {
+      remote.error = !remote.data;
+    }
+    // Se nel frattempo il giorno o la fascia scelti si sono riempiti, vanno riscelti
+    if (state.date && dayFull(state.date)) state.date = null;
+    if (!state.date || (state.slot && isFull(state.date, SLOTS.indexOf(state.slot)))) state.slot = null;
+    renderDays();
+    renderSlots();
+    update();
+  }
 
   $("#days").addEventListener("click", e => {
     const btn = e.target.closest(".day");
@@ -135,7 +169,11 @@
   });
 
   function renderSlots() {
-    if (!state.date) { $("#slots").innerHTML = `<p class="muted" style="grid-column:1/-1;font-size:.9rem">Scegli prima un giorno.</p>`; return; }
+    const note = html => { $("#slots").innerHTML = `<p class="muted" style="grid-column:1/-1;font-size:.9rem">${html}</p>`; };
+    if (CALENDAR_ENDPOINT && !remote.data) return note(remote.error
+      ? `Non riesco a leggere la disponibilità. <button type="button" class="retry" data-retry>Riprova</button>`
+      : "Controllo la disponibilità…");
+    if (!state.date) return note("Scegli prima un giorno.");
     const sunday = fromIso(state.date).getDay() === 0;
     $("#slots").innerHTML = SLOTS.map((s, i) => {
       const closed = sunday && i > 2;
@@ -144,6 +182,7 @@
     }).join("");
   }
   $("#slots").addEventListener("click", e => {
+    if (e.target.closest("[data-retry]")) { remote.error = false; renderSlots(); return loadRemote(); }
     const btn = e.target.closest(".slot");
     if (!btn || btn.disabled) return;
     document.querySelectorAll(".slot").forEach(s => s.classList.toggle("is-selected", s === btn));
@@ -210,8 +249,10 @@
   $("#nextBtn").addEventListener("click", () => {
     const err = validate(state.step);
     if (err) { errEl.textContent = err; return; }
-    if (state.step < 3) goTo(state.step + 1);
-    else submit();
+    if (state.step < 3) {
+      goTo(state.step + 1);
+      if (state.step === 2) loadRemote();
+    } else submit();
   });
   $("#backBtn").addEventListener("click", () => goTo(state.step - 1));
 
@@ -219,7 +260,7 @@
   const load = () => { try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; } catch { return []; } };
   const save = list => { try { localStorage.setItem(STORE_KEY, JSON.stringify(list)); } catch {} };
 
-  function submit() {
+  async function submit() {
     const p = price();
     const order = {
       code: "AUR-" + Math.floor(1000 + Math.random() * 9000),
@@ -230,6 +271,38 @@
       total: p.total, name: $("#name").value.trim(), phone: $("#phone").value.trim(),
       createdAt: new Date().toISOString(),
     };
+
+    if (CALENDAR_ENDPOINT) {
+      const btn = $("#nextBtn");
+      btn.disabled = true;
+      btn.textContent = "Invio dell'ordine…";
+      let out;
+      try {
+        // text/plain body keeps this a "simple" request, so Apps Script needs no CORS preflight
+        const res = await fetch(CALENDAR_ENDPOINT, { method: "POST", body: JSON.stringify({
+          action: "book", cake: state.cake, servings: state.servings, variant: state.variant, extras: [...state.extras],
+          writing: order.writing, date: order.date, slot: order.slot, delivery: order.delivery, address: order.address,
+          name: order.name, phone: order.phone, email: $("#email").value.trim(), notes: $("#notes").value.trim() }) });
+        out = await res.json();
+      } catch {
+        out = { ok: false, error: "network" };
+      }
+      btn.disabled = false;
+      update();
+      if (!out.ok) {
+        if (out.error === "full" || out.error === "closed") {
+          state.slot = null;
+          goTo(2);
+          await loadRemote();
+          errEl.textContent = "Quella fascia si è appena riempita: scegline un'altra.";
+        } else {
+          errEl.textContent = "Invio non riuscito. Controlla la connessione e riprova.";
+        }
+        return;
+      }
+      Object.assign(order, { code: out.code, total: out.total, remote: true });
+    }
+
     save([order, ...load()]);
     showConfirm(order);
     renderOrders();
@@ -289,9 +362,22 @@
       </li>`;
     }).join("");
   }
-  $("#ordersList").addEventListener("click", e => {
+  $("#ordersList").addEventListener("click", async e => {
     const code = e.target.dataset.cancel;
     if (!code || !confirm("Vuoi annullare questo ordine?")) return;
+    const o = load().find(x => x.code === code);
+    if (CALENDAR_ENDPOINT && o && o.remote) {
+      let out;
+      try {
+        const res = await fetch(CALENDAR_ENDPOINT, { method: "POST", body: JSON.stringify({ action: "cancel", code, phone: o.phone }) });
+        out = await res.json();
+      } catch {
+        out = { ok: false };
+      }
+      // not_found = già cancellato dalla pasticceria nel calendario: va tolto anche qui
+      if (!out.ok && out.error !== "not_found") return toast("Annullamento non riuscito, riprova");
+      loadRemote();
+    }
     save(load().filter(o => o.code !== code));
     renderOrders();
     toast("Ordine annullato");
@@ -334,4 +420,5 @@
     .observe($("#ordina"));
 
   update();
+  loadRemote();
 })();

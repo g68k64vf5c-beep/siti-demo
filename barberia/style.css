@@ -196,6 +196,7 @@ h3 { font-size: 1.1rem; font-weight: 700; }
 .slot:disabled { opacity: .25; text-decoration: line-through; cursor: not-allowed; }
 .slot.is-selected { background: var(--brass); color: #121212; border-color: var(--brass); }
 .no-slots { color: var(--text-soft); padding: 18px; text-align: center; background: var(--card); border-radius: var(--radius); }
+.retry { background: none; border: 0; color: var(--brass); text-decoration: underline; font-weight: 700; cursor: pointer; padding: 4px; }
 
 .ticket { background: var(--card); border-radius: var(--radius); border: 1px solid var(--line); margin-bottom: 18px; overflow: hidden; }
 .ticket-row { display: flex; justify-content: space-between; gap: 12px; padding: 11px 16px; border-bottom: 1px solid var(--line); font-size: .92rem; }
