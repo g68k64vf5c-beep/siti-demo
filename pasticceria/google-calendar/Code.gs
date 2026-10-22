@@ -72,6 +72,8 @@ function schedule(from, days) {
     slots[date][slot] = (slots[date][slot] || 0) + n;
   };
 
+  const meta = PropertiesService.getScriptProperties().getProperties();
+
   getCalendar().getEvents(start, end).forEach(ev => {
     // Evento di tutto il giorno messo a mano (ferie, chiusura): giornata non ordinabile
     if (ev.isAllDayEvent()) {
@@ -79,7 +81,8 @@ function schedule(from, days) {
       return;
     }
     const day = fmt(ev.getStartTime(), "yyyy-MM-dd");
-    const tagged = ev.getTag("slot");
+    const m = readMeta(meta, ev);
+    const tagged = m && m.slot;
     if (tagged) {
       add(day, tagged, 1);
       orders[day] = (orders[day] || 0) + 1;
@@ -164,10 +167,7 @@ function book(b) {
         ].filter(String).join("\n"),
       }
     );
-    ev.setTag("slot", b.slot);
-    ev.setTag("code", code);
-    ev.setTag("phone", digits);
-    ev.setColor(delivery === "consegna" ? CalendarApp.EventColor.ORANGE : CalendarApp.EventColor.PALE_RED);
+    saveMeta(ev, code, digits, { slot: b.slot });
     return { ok: true, code: code, total: total };
   } finally {
     lock.releaseLock();
@@ -178,12 +178,7 @@ function cancel(b) {
   const code = clean(b.code, 20);
   const digits = clean(b.phone, 30).replace(/\D/g, "");
   if (!code || !digits) return { ok: false, error: "bad_request" };
-  const from = new Date(Date.now() - 864e5);
-  const to = new Date(Date.now() + (CONFIG.daysAhead + 1) * 864e5);
-  const ev = getCalendar().getEvents(from, to).find(x => x.getTag("code") === code && x.getTag("phone") === digits);
-  if (!ev) return { ok: false, error: "not_found" };
-  ev.deleteEvent();
-  return { ok: true };
+  return deleteBooking(code, digits);
 }
 
 /* ---------- Helpers ---------- */
@@ -204,6 +199,30 @@ function getCalendar() {
 // Da eseguire una volta dall'editor: crea il calendario e chiede le autorizzazioni
 function setup() {
   Logger.log("Calendario pronto: " + getCalendar().getName());
+}
+
+// I dati di ogni ordine (fascia, codice, telefono) stanno nella memoria dello script:
+// leggerli e scriverli è istantaneo, mentre ogni etichetta salvata sull'evento è una chiamata lenta a Calendar
+function readMeta(all, ev) {
+  const m = all["ev:" + ev.getId()];
+  return m ? JSON.parse(m) : null;
+}
+function saveMeta(ev, code, digits, meta) {
+  const p = {};
+  p["ev:" + ev.getId()] = JSON.stringify(meta);
+  p["code:" + code] = JSON.stringify({ id: ev.getId(), phone: digits });
+  PropertiesService.getScriptProperties().setProperties(p);
+}
+function deleteBooking(code, digits) {
+  const store = PropertiesService.getScriptProperties();
+  const ref = JSON.parse(store.getProperty("code:" + code) || "null");
+  if (!ref || ref.phone !== digits) return { ok: false, error: "not_found" };
+  const ev = getCalendar().getEventById(ref.id);
+  store.deleteProperty("code:" + code);
+  store.deleteProperty("ev:" + ref.id);
+  if (!ev) return { ok: false, error: "not_found" };
+  ev.deleteEvent();
+  return { ok: true };
 }
 
 // "10:00–12:00" → [600, 720]

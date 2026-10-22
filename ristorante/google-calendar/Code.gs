@@ -55,6 +55,7 @@ function availability(date) {
   const slots = {};
   const blocked = [];
   let closed = false;
+  const meta = PropertiesService.getScriptProperties().getProperties();
 
   getCalendar().getEvents(dayStart, dayEnd).forEach(ev => {
     // Evento "Chiuso" di tutto il giorno, messo a mano dal titolare: giornata non prenotabile
@@ -62,7 +63,8 @@ function availability(date) {
       if (/chius/i.test(ev.getTitle())) closed = true;
       return;
     }
-    const covers = Number(ev.getTag("covers"));
+    const m = readMeta(meta, ev);
+    const covers = m ? m.covers : 0;
     if (covers) {
       const t = Utilities.formatDate(ev.getStartTime(), CONFIG.timeZone, "HH:mm");
       slots[t] = (slots[t] || 0) + covers;
@@ -133,10 +135,7 @@ function book(b) {
         ].filter(String).join("\n"),
       }
     );
-    ev.setTag("covers", String(guests));
-    ev.setTag("code", code);
-    ev.setTag("phone", digits);
-    if (occasion) ev.setColor(CalendarApp.EventColor.MAUVE);
+    saveMeta(ev, code, digits, { covers: guests });
     return { ok: true, code: code };
   } finally {
     lock.releaseLock();
@@ -147,12 +146,7 @@ function cancel(b) {
   const code = clean(b.code, 20);
   const digits = clean(b.phone, 30).replace(/\D/g, "");
   if (!code || !digits) return { ok: false, error: "bad_request" };
-  const from = new Date(Date.now() - 864e5);
-  const to = new Date(Date.now() + CONFIG.daysAhead * 864e5);
-  const ev = getCalendar().getEvents(from, to).find(x => x.getTag("code") === code && x.getTag("phone") === digits);
-  if (!ev) return { ok: false, error: "not_found" };
-  ev.deleteEvent();
-  return { ok: true };
+  return deleteBooking(code, digits);
 }
 
 /* ---------- Helpers ---------- */
@@ -173,6 +167,30 @@ function getCalendar() {
 // Da eseguire una volta dall'editor: crea il calendario e chiede le autorizzazioni
 function setup() {
   Logger.log("Calendario pronto: " + getCalendar().getName());
+}
+
+// I dati di ogni prenotazione (coperti, codice, telefono) stanno nella memoria dello script:
+// leggerli e scriverli è istantaneo, mentre ogni etichetta salvata sull'evento è una chiamata lenta a Calendar
+function readMeta(all, ev) {
+  const m = all["ev:" + ev.getId()];
+  return m ? JSON.parse(m) : null;
+}
+function saveMeta(ev, code, digits, meta) {
+  const p = {};
+  p["ev:" + ev.getId()] = JSON.stringify(meta);
+  p["code:" + code] = JSON.stringify({ id: ev.getId(), phone: digits });
+  PropertiesService.getScriptProperties().setProperties(p);
+}
+function deleteBooking(code, digits) {
+  const store = PropertiesService.getScriptProperties();
+  const ref = JSON.parse(store.getProperty("code:" + code) || "null");
+  if (!ref || ref.phone !== digits) return { ok: false, error: "not_found" };
+  const ev = getCalendar().getEventById(ref.id);
+  store.deleteProperty("code:" + code);
+  store.deleteProperty("ev:" + ref.id);
+  if (!ev) return { ok: false, error: "not_found" };
+  ev.deleteEvent();
+  return { ok: true };
 }
 
 function at(date, time) {

@@ -320,6 +320,7 @@
     if (CALENDAR_ENDPOINT) {
       nextBtn.disabled = true;
       nextBtn.textContent = "Invio…";
+      const slow = setTimeout(() => (nextBtn.textContent = "Salvo in agenda…"), 3500);
       let out;
       try {
         // text/plain body keeps this a "simple" request, so Apps Script needs no CORS preflight
@@ -330,6 +331,7 @@
       } catch {
         out = { ok: false, error: "network" };
       }
+      clearTimeout(slow);
       nextBtn.disabled = false;
       updateFoot();
       if (!out.ok) {

@@ -36,8 +36,8 @@ verde **"Disponibilità in tempo reale"**.
 
 ## Come si usa ogni giorno
 
-- **Le prenotazioni** arrivano nel calendario con nome, telefono, persone, sala, occasione e note.
-  Le occasioni speciali (compleanno, anniversario…) sono colorate in viola.
+- **Le prenotazioni** arrivano nel calendario con nome, telefono, persone, sala, occasione e note
+  (l'occasione speciale è anche nel titolo, per esempio "🍽 4 pers. · Rossi · Compleanno").
 - **Chiudere un giorno** (ferie, evento privato): crea un evento di *tutto il giorno* con "Chiuso" nel titolo.
 - **Bloccare una fascia oraria**: crea un evento normale, per esempio 21:00–23:00 "Sala riservata".
   Gli orari coperti spariscono dal sito.

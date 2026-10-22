@@ -291,6 +291,7 @@
     if (CALENDAR_ENDPOINT) {
       nextBtn.disabled = true;
       nextBtn.textContent = "Invio in corso…";
+      const slow = setTimeout(() => (nextBtn.textContent = "Salvo nel calendario…"), 3500);
       let out;
       try {
         // text/plain body keeps this a "simple" request, so Apps Script needs no CORS preflight
@@ -299,6 +300,7 @@
       } catch {
         out = { ok: false, error: "network" };
       }
+      clearTimeout(slow);
       nextBtn.disabled = false;
       nextBtn.textContent = "Conferma prenotazione";
       if (!out.ok) {

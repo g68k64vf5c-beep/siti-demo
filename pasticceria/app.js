@@ -276,6 +276,7 @@
       const btn = $("#nextBtn");
       btn.disabled = true;
       btn.textContent = "Invio dell'ordine…";
+      const slow = setTimeout(() => (btn.textContent = "Salvo nel calendario…"), 3500);
       let out;
       try {
         // text/plain body keeps this a "simple" request, so Apps Script needs no CORS preflight
@@ -287,6 +288,7 @@
       } catch {
         out = { ok: false, error: "network" };
       }
+      clearTimeout(slow);
       btn.disabled = false;
       update();
       if (!out.ok) {

@@ -31,11 +31,11 @@ const SERVICES = {
   grigio: { name: "Camouflage grigio", min: 20, price: 18 },
 };
 
-// Ogni barbiere ha il suo colore in calendario
+// Il nome del barbiere apre il titolo dell'evento, così in calendario si vede subito di chi è
 const BARBERS = {
-  marco: { name: "Marco", color: "YELLOW" },
-  luca: { name: "Luca", color: "ORANGE" },
-  davide: { name: "Davide", color: "PALE_GREEN" },
+  marco: { name: "Marco" },
+  luca: { name: "Luca" },
+  davide: { name: "Davide" },
 };
 const BARBER_IDS = Object.keys(BARBERS);
 
@@ -70,8 +70,10 @@ function schedule(from, days) {
     (busy[date][barber] = busy[date][barber] || []).push(range);
   };
 
+  const meta = PropertiesService.getScriptProperties().getProperties();
+
   getCalendar().getEvents(start, end).forEach(ev => {
-    const who = barbersOf(ev);
+    const who = barbersOf(ev, meta);
     if (ev.isAllDayEvent()) {
       // Tutto il giorno: col nome di un barbiere = quel barbiere è assente, altrimenti negozio chiuso
       for (let d = ev.getAllDayStartDate(); d < ev.getAllDayEndDate(); d = new Date(d.getTime() + 864e5)) {
@@ -90,10 +92,10 @@ function schedule(from, days) {
   return { closed: Object.keys(closed), busy: busy };
 }
 
-// A chi si riferisce un evento: tag messo dal sito, oppure nome del barbiere nel titolo, oppure a tutti
-function barbersOf(ev) {
-  const tag = ev.getTag("barber");
-  if (tag && BARBERS[tag]) return [tag];
+// A chi si riferisce un evento: barbiere salvato dal sito, oppure nome del barbiere nel titolo, oppure a tutti
+function barbersOf(ev, meta) {
+  const m = readMeta(meta, ev);
+  if (m && BARBERS[m.barber]) return [m.barber];
   const title = ev.getTitle().toLowerCase();
   const named = BARBER_IDS.filter(id => title.indexOf(BARBERS[id].name.toLowerCase()) !== -1);
   return named.length ? named : BARBER_IDS.slice();
@@ -162,10 +164,7 @@ function book(b) {
         ].filter(String).join("\n"),
       }
     );
-    ev.setTag("barber", barber);
-    ev.setTag("code", code);
-    ev.setTag("phone", digits);
-    ev.setColor(CalendarApp.EventColor[BARBERS[barber].color]);
+    saveMeta(ev, code, digits, { barber: barber });
     return { ok: true, code: code, barber: barber, minutes: minutes, total: price };
   } finally {
     lock.releaseLock();
@@ -176,12 +175,7 @@ function cancel(b) {
   const code = clean(b.code, 20);
   const digits = clean(b.phone, 30).replace(/\D/g, "");
   if (!code || !digits) return { ok: false, error: "bad_request" };
-  const from = new Date(Date.now() - 864e5);
-  const to = new Date(Date.now() + CONFIG.daysAhead * 864e5);
-  const ev = getCalendar().getEvents(from, to).find(x => x.getTag("code") === code && x.getTag("phone") === digits);
-  if (!ev) return { ok: false, error: "not_found" };
-  ev.deleteEvent();
-  return { ok: true };
+  return deleteBooking(code, digits);
 }
 
 /* ---------- Helpers ---------- */
@@ -202,6 +196,30 @@ function getCalendar() {
 // Da eseguire una volta dall'editor: crea il calendario e chiede le autorizzazioni
 function setup() {
   Logger.log("Calendario pronto: " + getCalendar().getName());
+}
+
+// I dati di ogni appuntamento (barbiere, codice, telefono) stanno nella memoria dello script:
+// leggerli e scriverli è istantaneo, mentre ogni etichetta salvata sull'evento è una chiamata lenta a Calendar
+function readMeta(all, ev) {
+  const m = all["ev:" + ev.getId()];
+  return m ? JSON.parse(m) : null;
+}
+function saveMeta(ev, code, digits, meta) {
+  const p = {};
+  p["ev:" + ev.getId()] = JSON.stringify(meta);
+  p["code:" + code] = JSON.stringify({ id: ev.getId(), phone: digits });
+  PropertiesService.getScriptProperties().setProperties(p);
+}
+function deleteBooking(code, digits) {
+  const store = PropertiesService.getScriptProperties();
+  const ref = JSON.parse(store.getProperty("code:" + code) || "null");
+  if (!ref || ref.phone !== digits) return { ok: false, error: "not_found" };
+  const ev = getCalendar().getEventById(ref.id);
+  store.deleteProperty("code:" + code);
+  store.deleteProperty("ev:" + ref.id);
+  if (!ev) return { ok: false, error: "not_found" };
+  ev.deleteEvent();
+  return { ok: true };
 }
 
 function at(date, time) { return Utilities.parseDate(date + " " + time, CONFIG.timeZone, "yyyy-MM-dd HH:mm"); }

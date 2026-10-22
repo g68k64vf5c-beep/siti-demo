@@ -1,7 +1,7 @@
 # Collegare gli ordini della pasticceria a Google Calendar
 
 Ogni torta ordinata sul sito diventa un evento nel calendario Google "Ordini Pasticceria Aurora",
-nella fascia di ritiro scelta (rosa = ritiro in negozio, arancione = consegna). Il sito legge lo stesso
+nella fascia di ritiro scelta (le consegne hanno "🛵 consegna" nel titolo). Il sito legge lo stesso
 calendario per non accettare più ordini di quanti il laboratorio riesce a preparare.
 Serve solo un account Google: niente server, niente costi.
 

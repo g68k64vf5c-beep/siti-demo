@@ -1,7 +1,7 @@
 # Collegare gli appuntamenti della barberia a Google Calendar
 
 Ogni appuntamento preso sul sito diventa un evento nel calendario Google "Appuntamenti Ferro & Lama",
-colorato per barbiere (Marco giallo, Luca arancione, Davide verde). Il sito legge lo stesso calendario
+con il nome del barbiere all'inizio del titolo (per esempio "✂️ Marco · Rossi · Taglio uomo"). Il sito legge lo stesso calendario
 per mostrare solo gli orari liberi di ciascun barbiere. Serve solo un account Google: niente server, niente costi.
 
 ## 1. Crea lo script (5 minuti, dal computer)
