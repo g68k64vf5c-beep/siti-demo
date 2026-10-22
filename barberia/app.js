@@ -4,7 +4,7 @@
   const STORE_KEY = "fl_appointments";
   // URL della Web App di Google Apps Script (vedi google-calendar/LEGGIMI.md).
   // Vuoto = modalità demo: agenda simulata e appuntamenti solo nel browser.
-  const CALENDAR_ENDPOINT = "https://script.google.com/macros/s/AKfycbwkntsTHfHyNlmJv_McMffYaBnYODzZ0CbIWRQvpFm1v3oGUcoTDIWQwTpOuvJmzjjCpA/exec";
+  const CALENDAR_ENDPOINT = "https://script.google.com/macros/s/AKfycbxFeGiu4q6j_jvrLL0VOfCs_f7t7nUSJyEZOU5uYPoLxiFR6Ogk2zDenaSBcDOXbRfeAg/exec";
 
   /* ---------- Data ---------- */
   const SERVICES = [
