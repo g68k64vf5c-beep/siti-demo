@@ -4,7 +4,7 @@
   const STORE_KEY = "borgo_reservations";
   // URL della Web App di Google Apps Script (vedi google-calendar/LEGGIMI.md).
   // Vuoto = modalità demo: disponibilità simulata e prenotazioni solo nel browser.
-  const CALENDAR_ENDPOINT = "";
+  const CALENDAR_ENDPOINT = "https://script.google.com/macros/s/AKfycbxzD6cKtNfVcqOmuVX5IR-eJWdnyHxHh9MfPE5kdaITO3HQVW7WEEpozEyTBcjSQhEgNw/exec";
 
   /* ---------- Opening hours (0 = domenica) ---------- */
   const HOURS = {
